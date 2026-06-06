@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  ml-service:
+    build: ./ml-service
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - ./ml-service/data:/app/data
+      - ./ml-service/model_artifacts.pkl:/app/model_artifacts.pkl
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - FASTAPI_URL=http://ml-service:8000
+    depends_on:
+      - ml-service
+    volumes:
+      - ./backend/mulewatch.db:/app/mulewatch.db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:3000
+    depends_on:
+      - backend

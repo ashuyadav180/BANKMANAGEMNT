@@ -1,0 +1,19 @@
+node_modules/
+.npm/
+.env
+dist/
+build/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.DS_Store
+.vscode/
+
+# Ignore large data files that break Github push
+ml-service/data/DataSet.csv
+backend/mulewatch.db
+backend/mulewatch.db-shm
+backend/mulewatch.db-wal
