@@ -17,6 +17,7 @@ services:
       - "3000:3000"
     environment:
       - FASTAPI_URL=http://ml-service:8000
+      - PORT=3000
     depends_on:
       - ml-service
     volumes:

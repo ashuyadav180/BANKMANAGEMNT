@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, ChevronRight, Lock, ShieldOff, CheckCircle, Download, Sparkles } from 'lucide-react';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:3001');
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const socket = io(BACKEND_URL);
 
 function transformBackendData(data) {
   const score = data.risk_score;
@@ -61,7 +62,7 @@ export default function MuleWatchUI() {
   // Init & Socket
   useEffect(() => {
     // Fetch historical data
-    fetch('http://localhost:3001/api/predictions?limit=25')
+    fetch(`${BACKEND_URL}/api/predictions?limit=25`)
       .then(res => res.json())
       .then(data => {
         const parsed = data.map(transformBackendData);

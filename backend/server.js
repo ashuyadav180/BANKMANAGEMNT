@@ -13,7 +13,7 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
-const FASTAPI_URL = process.env.FASTAPI_URL || 'http://localhost:8000';
+const FASTAPI_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
 
 // API route to accept a prediction request from frontend, proxy to ML service, and save
 app.post('/api/predict', async (req, res) => {
