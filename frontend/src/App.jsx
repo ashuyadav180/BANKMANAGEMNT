@@ -375,11 +375,13 @@ export default function MuleWatchUI() {
 
   useEffect(() => {
     if (selectedAcc && selectedAcc.level === 'HIGH') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowAlertStrip(true);
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowAlertStrip(false);
     }
-  }, [selectedAcc?.id]);
+  }, [selectedAcc]);
 
   const confirmFreeze = () => {
     if (selectedAcc) {
@@ -405,7 +407,7 @@ export default function MuleWatchUI() {
       
       <div style={{
         height: showAlertStrip ? 28 : 0, overflow: 'hidden',
-        background: 'var(--red-08)', borderBottom: showAlertStrip ? '1px solid var(--red-20)' : 'none',
+        background: 'rgba(255, 59, 92, 0.15)', borderBottom: showAlertStrip ? '1px solid var(--red-20)' : 'none',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '0 24px',
         animation: showAlertStrip ? 'stripExpand 200ms ease-out forwards' : 'none', flexShrink: 0
       }}>
@@ -448,7 +450,7 @@ export default function MuleWatchUI() {
             animation: 'scaleIn 220ms ease-out'
           }}>
             <div style={{
-              width: 52, height: 52, borderRadius: '50%', background: 'var(--red-08)', border: '1px solid var(--red-20)',
+              width: 52, height: 52, borderRadius: '50%', background: 'rgba(255, 59, 92, 0.15)', border: '1px solid var(--red-20)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16
             }}>
               <ShieldOff style={{ width: 22, color: 'var(--red)' }} />
@@ -492,7 +494,7 @@ function TopBar({ analyzedCount, alertCount, latency }) {
 
       {/* Zone B */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '0 12px', height: 28, border: '1px solid var(--green-20)', borderRadius: 6, background: 'var(--green-08)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '0 12px', height: 28, border: '1px solid var(--green-20)', borderRadius: 6, background: 'rgba(46, 204, 122, 0.15)' }}>
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', animation: 'pulse-ring-green 1.5s ease-out infinite' }}/>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, letterSpacing: '1px', color: 'var(--green)', textTransform: 'uppercase' }}>INGESTING LIVE STREAM</span>
         </div>
@@ -525,7 +527,7 @@ function TopBar({ analyzedCount, alertCount, latency }) {
           <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--t3)' }}>MODEL ACC</span>
         </div>
         <div style={{
-          width: 32, height: 32, borderRadius: '50%', background: 'var(--cyan-08)', border: '1px solid var(--cyan-20)',
+          width: 32, height: 32, borderRadius: '50%', background: 'rgba(0, 229, 195, 0.15)', border: '1px solid var(--cyan-20)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600, color: 'var(--cyan)', marginLeft: 4
         }}>AY</div>
@@ -535,6 +537,7 @@ function TopBar({ analyzedCount, alertCount, latency }) {
 }
 
 function FeedPanel({ accounts, filter, setFilter, selectedAcc, setSelectedAcc, frozenAccounts, clearedAccounts }) {
+  const [searchQuery, setSearchQuery] = useState('');
   return (
     <div style={{ background: 'var(--bg-1)', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-1)', borderBottom: '1px solid var(--b1)', flexShrink: 0 }}>
@@ -549,7 +552,9 @@ function FeedPanel({ accounts, filter, setFilter, selectedAcc, setSelectedAcc, f
         <div style={{ position: 'relative', width: '100%' }}>
           <Search style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--t3)', width: 13 }}/>
           <input
-            placeholder="Search account ID or amount…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search account ID or amount..."
             style={{ width: '100%', height: 34, background: 'var(--bg-2)', border: '1px solid var(--b1)', borderRadius: 6, padding: '0 12px 0 32px', fontSize: 12, color: 'var(--t1)', fontFamily: 'inherit', outline: 'none' }}
             onFocus={e => e.target.style.borderColor = 'var(--cyan-dim)'}
             onBlur={e => e.target.style.borderColor = 'var(--b1)'}
@@ -574,7 +579,7 @@ function FeedPanel({ accounts, filter, setFilter, selectedAcc, setSelectedAcc, f
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-        {accounts.filter(a => filter === 'ALL' || a.level === filter).map(acc => {
+        {accounts.filter(a => (filter === 'ALL' || a.level === filter) && (a.id.toLowerCase().includes(searchQuery.toLowerCase()) || a.amount.toString().includes(searchQuery))).map(acc => {
           const isSelected = selectedAcc?.id === acc.id;
           const level = acc.level;
           return (
@@ -638,7 +643,7 @@ function AnalysisPanel({ acc, setShowFreezeModal, handleClear, frozenAccounts, a
   return (
     <>
       {/* Account header section */}
-      <div style={{ padding: '16px', borderBottom: '1px solid var(--b1)', display: 'grid', gridTemplateColumns: '1fr 96px', alignItems: 'start', gap: 12, flexShrink: 0 }}>
+      <div style={{ padding: '16px', borderBottom: '1px solid var(--b2)', display: 'grid', gridTemplateColumns: '1fr 96px', alignItems: 'start', gap: 12, flexShrink: 0 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 600, color: 'var(--cyan)', letterSpacing: '0.5px' }}>{acc.id}</span>
@@ -660,9 +665,10 @@ function AnalysisPanel({ acc, setShowFreezeModal, handleClear, frozenAccounts, a
       <div style={{ display: 'flex', height: 40, position: 'sticky', top: 0, zIndex: 9, background: 'var(--bg-1)', borderBottom: '1px solid var(--b1)', flexShrink: 0 }}>
         {tabs.map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-            flex: 1, height: '100%', border: 'none', borderBottom: activeTab === tab.id ? '2px solid var(--cyan)' : '2px solid transparent',
-            background: 'transparent', fontSize: 9, fontWeight: 600, letterSpacing: '1.2px', textTransform: 'uppercase',
-            color: activeTab === tab.id ? 'var(--cyan)' : 'var(--t3)', cursor: 'pointer', transition: 'color 150ms ease, border-color 150ms ease', padding: 0, marginBottom: '-1px'
+            flex: 1, height: '100%', border: 'none', borderBottom: activeTab === tab.id ? '3px solid var(--cyan)' : '3px solid transparent',
+            background: activeTab === tab.id ? 'rgba(0, 229, 195, 0.15)' : 'transparent', 
+            fontSize: activeTab === tab.id ? 11 : 10, fontWeight: activeTab === tab.id ? 800 : 600, letterSpacing: '1.2px', textTransform: 'uppercase',
+            color: activeTab === tab.id ? '#FFFFFF' : 'var(--t3)', cursor: 'pointer', transition: 'all 150ms ease', padding: 0, marginBottom: '-1px'
           }}>{tab.label}</button>
         ))}
       </div>
@@ -716,9 +722,9 @@ function OverviewTab({ acc }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       {/* Section 1 - Rule-Based Explanation Card */}
-      <div style={{ padding: '16px', borderBottom: '1px solid var(--b1)' }}>
-        <div style={{ background: 'var(--bg-2)', border: '1px solid var(--b1)', borderLeft: '3px solid var(--amber)', borderRadius: 8, overflow: 'hidden' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderBottom: '1px solid var(--b1)' }}>
+      <div style={{ padding: '16px', borderBottom: '1px solid var(--b2)' }}>
+        <div style={{ background: 'var(--bg-2)', border: '1px solid var(--b2)', borderLeft: '4px solid var(--amber)', borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderBottom: '1px solid var(--b2)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Code size={13} color="var(--amber)" />
               <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', color: 'var(--amber)' }}>RULE-BASED EXPLANATION</span>
@@ -781,9 +787,9 @@ function OverviewTab({ acc }) {
           </div>
 
           <div style={{ padding: '10px 14px', display: 'flex', gap: 8, flexWrap: 'wrap', borderTop: '1px solid var(--b1)' }}>
-            <span style={{ height: 22, padding: '0 10px', borderRadius: 11, fontSize: 9, fontWeight: 600, display: 'flex', alignItems: 'center', background: 'var(--cyan-08)', border: '1px solid var(--cyan-20)', color: 'var(--cyan)' }}>RULE SUPPORT: {acc.ruleSupport} cases</span>
-            <span style={{ height: 22, padding: '0 10px', borderRadius: 11, fontSize: 9, fontWeight: 600, display: 'flex', alignItems: 'center', background: 'var(--red-08)', border: '1px solid var(--red-20)', color: 'var(--red)' }}>FRAUD LIFT: {acc.fraudLift}×</span>
-            <span style={{ height: 22, padding: '0 10px', borderRadius: 11, fontSize: 9, fontWeight: 600, display: 'flex', alignItems: 'center', background: 'var(--green-08)', border: '1px solid var(--green-20)', color: 'var(--green)' }}>RELIABILITY: 94.7%</span>
+            <span style={{ height: 22, padding: '0 10px', borderRadius: 11, fontSize: 9, fontWeight: 600, display: 'flex', alignItems: 'center', background: 'rgba(0, 229, 195, 0.15)', border: '1px solid var(--cyan-20)', color: 'var(--cyan)' }}>RULE SUPPORT: {acc.ruleSupport} cases</span>
+            <span style={{ height: 22, padding: '0 10px', borderRadius: 11, fontSize: 9, fontWeight: 600, display: 'flex', alignItems: 'center', background: 'rgba(255, 59, 92, 0.15)', border: '1px solid var(--red-20)', color: 'var(--red)' }}>FRAUD LIFT: {acc.fraudLift}×</span>
+            <span style={{ height: 22, padding: '0 10px', borderRadius: 11, fontSize: 9, fontWeight: 600, display: 'flex', alignItems: 'center', background: 'rgba(46, 204, 122, 0.15)', border: '1px solid var(--green-20)', color: 'var(--green)' }}>RELIABILITY: 94.7%</span>
           </div>
           
           <div style={{ padding: '8px 14px', fontSize: 9, fontStyle: 'italic', color: 'var(--t3)', borderTop: '1px solid var(--b1)' }}>
@@ -793,9 +799,9 @@ function OverviewTab({ acc }) {
       </div>
       
       {/* Section 2 - SHAP Contributing Factors */}
-      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--b1)' }}>
+      <div style={{ padding: '16px 16px', borderBottom: '1px solid var(--b2)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', color: 'var(--t2)' }}>TOP CONTRIBUTING FACTORS (SHAP)</span>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1.6px', color: 'var(--t1)', textTransform: 'uppercase'}}>TOP CONTRIBUTING FACTORS (SHAP)</span>
           <Info size={12} color="var(--t3)" />
         </div>
         {acc.shapValues.slice(0, 6).map((feat, i) => {
@@ -815,8 +821,8 @@ function OverviewTab({ acc }) {
       <MultimodalAnalysis acc={acc} />
 
       {/* Section 4 - Risk Factor Summary Table */}
-      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--b1)' }}>
-        <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', color: 'var(--t2)', display: 'block', marginBottom: 8 }}>RISK FACTOR SUMMARY</span>
+      <div style={{ padding: '16px 16px', borderBottom: '1px solid var(--b2)' }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1.6px', color: 'var(--t1)', textTransform: 'uppercase', marginBottom: 8, display: 'block'}}>RISK FACTOR SUMMARY</span>
         <div style={{ width: '100%' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 70px 90px 70px', height: 28, borderBottom: '1px solid var(--b1)', alignItems: 'center' }}>
             {["FACTOR","IMPACT","DIRECTION","WEIGHT"].map(h => <span key={h} style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', color: 'var(--t3)' }}>{h}</span>)}
@@ -839,7 +845,10 @@ function MultimodalAnalysis({ acc }) {
   const [analyzed, setAnalyzed] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => { setAnalyzed(false); setLoading(false); }, [acc.id]);
+  useEffect(() => { 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAnalyzed(false); setLoading(false); 
+  }, [acc.id]);
 
   const handleAnalyze = () => {
     setLoading(true);
@@ -856,9 +865,9 @@ function MultimodalAnalysis({ acc }) {
   const points = acc.txTimeSeries.map((v, i) => `${(i/29)*100},${90 - (v/maxVal)*80}`).join(' ');
 
   return (
-    <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--b1)' }}>
+    <div style={{ padding: '16px 16px', borderBottom: '1px solid var(--b2)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-        <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--t2)', textTransform: 'uppercase' }}>VISUAL PATTERN ANALYSIS</span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1.6px', color: 'var(--t1)', textTransform: 'uppercase'}}>VISUAL PATTERN ANALYSIS</span>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <span style={{ fontSize: 9, fontStyle: 'italic', color: 'var(--t3)' }}>VisualTimeAnomaly · Multimodal LLM Detection</span>
           <PaperBadge type="multimodal" />
@@ -903,7 +912,7 @@ function MultimodalAnalysis({ acc }) {
 
       {!analyzed && !loading && (
         <button onClick={handleAnalyze} style={{
-          width: '100%', height: 34, marginTop: 10, background: 'var(--purple-08)', border: '1px solid var(--purple-20)', borderRadius: 6,
+          width: '100%', height: 34, marginTop: 10, background: 'rgba(151, 71, 255, 0.15)', border: '1px solid var(--purple-20)', borderRadius: 6,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', fontSize: 10, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--purple)', transition: 'background 200ms'
         }} onMouseEnter={e => e.currentTarget.style.background='var(--purple-20)'} onMouseLeave={e => e.currentTarget.style.background='var(--purple-08)'}>
           <Eye size={13} />
@@ -936,7 +945,7 @@ function FlagGraphTab({ acc }) {
 
   return (
     <div style={{ padding: '0 0 16px 0' }}>
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--b1)', background: 'var(--purple-08)', borderLeft: '3px solid var(--purple)', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--b1)', background: 'rgba(151, 71, 255, 0.15)', borderLeft: '3px solid var(--purple)', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <p style={{ fontSize: 11, color: 'var(--t2)', fontStyle: 'italic', margin: 0 }}>
           "FLAG integrates LLMs with GNNs via semantic similarity neighbor sampling to filter camouflaged neighbors — deployed in Alipay's credit risk system with +6.97% AUC improvement."
         </p>
@@ -995,7 +1004,6 @@ function FlagGraphTab({ acc }) {
             {/* Edges */}
             {acc.neighbors.map((n, i) => {
               const angle = (-90 + i * 60) * (Math.PI / 180);
-              const x = 50 + 70 * Math.cos(angle) / (200/100); // adjust relative units. let's just use raw coords
               return (
                 <line key={`l${i}`} x1="50%" y1="50%" x2={`calc(50% + ${70 * Math.cos(angle)}px)`} y2={`calc(50% + ${70 * Math.sin(angle)}px)`} stroke={n.isLegitimate ? 'var(--green)' : 'var(--red)'} strokeWidth="1" strokeOpacity={n.isLegitimate ? 0.5 : 1} strokeDasharray={n.isLegitimate ? 'none' : '4 3'} style={n.isLegitimate ? {} : {animation: 'scrollDash 1s linear infinite'}} />
               );
@@ -1034,7 +1042,7 @@ function FlagGraphTab({ acc }) {
         </div>
 
         {acc.camouflageIndex > 60 && (
-          <div style={{ background: 'var(--red-08)', borderTop: '1px solid var(--red-20)', padding: '10px 16px', marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ background: 'rgba(255, 59, 92, 0.15)', borderTop: '1px solid var(--red-20)', padding: '10px 16px', marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
             <AlertTriangle size={12} color="var(--red)" />
             <span style={{ fontSize: 11, color: 'var(--red)' }}>HIGH CAMOUFLAGE: Fraud ring masking detected. FLAG algorithm confidence: 94.2%</span>
           </div>
@@ -1046,6 +1054,10 @@ function FlagGraphTab({ acc }) {
 
 // FEATURE 2 — QUANTUM
 function QuantumTab({ acc }) {
+  const [scatterDots] = useState(() => ({
+    green: Array.from({length: 25}).map(() => ({ cx: `${10+Math.random()*25}%`, cy: `${55+Math.random()*30}%` })),
+    red: Array.from({length: 15}).map(() => ({ cx: `${65+Math.random()*25}%`, cy: `${10+Math.random()*35}%` }))
+  }));
   return (
     <div style={{ padding: '0' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, padding: 16, borderBottom: '1px solid var(--b1)' }}>
@@ -1127,8 +1139,8 @@ function QuantumTab({ acc }) {
             <text x="5" y="10" fill="var(--t3)" fontSize="8">Feature Dim 2 ↑</text>
             
             {/* Scatter Dots */}
-            {Array.from({length: 25}).map((_, i) => <circle key={`l${i}`} cx={`${10+Math.random()*25}%`} cy={`${55+Math.random()*30}%`} r="1.5" fill="var(--green)" opacity="0.6" />)}
-            {Array.from({length: 15}).map((_, i) => <circle key={`f${i}`} cx={`${65+Math.random()*25}%`} cy={`${10+Math.random()*35}%`} r="1.5" fill="var(--red)" opacity="0.6" />)}
+            {scatterDots.green.map((pos, i) => <circle key={`l${i}`} cx={pos.cx} cy={pos.cy} r="1.5" fill="var(--green)" opacity="0.6" />)}
+            {scatterDots.red.map((pos, i) => <circle key={`f${i}`} cx={pos.cx} cy={pos.cy} r="1.5" fill="var(--red)" opacity="0.6" />)}
             
             {/* Current Account */}
             <polygon points="0,-3.5 3.5,0 0,3.5 -3.5,0" fill="var(--cyan)" transform={`translate(${(acc.quantumFeatureX+1)*50}%, ${(acc.quantumFeatureY+1)*50}%)`} />
@@ -1151,6 +1163,7 @@ function ZkProofTab({ acc }) {
 
   useEffect(() => {
     if (acc.zkFrozen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStep(1);
       const timers = [
         setTimeout(() => setStep(2), 450),
@@ -1277,17 +1290,17 @@ function TemporalTab({ acc }) {
 
   return (
     <div style={{ padding: '0 0 16px 0' }}>
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--b1)', background: 'var(--cyan-08)', borderLeft: '3px solid var(--cyan)', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--b1)', background: 'rgba(0, 229, 195, 0.15)', borderLeft: '3px solid var(--cyan)', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <p style={{ fontSize: 11, color: 'var(--t2)', fontStyle: 'italic', margin: 0 }}>
           "Static graph models fail to capture when connections formed — temporal GNNs reveal fraud ring assembly in real-time."
         </p>
         <PaperBadge type="temporal" />
       </div>
 
-      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--b1)' }}>
+      <div style={{ padding: '16px 16px', borderBottom: '1px solid var(--b2)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', color: 'var(--t2)' }}>NETWORK EVOLUTION · 30-DAY WINDOW</span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--cyan)', background: 'var(--cyan-08)', border: '1px solid var(--cyan-20)', padding: '3px 10px', borderRadius: 10 }}>DAY {day}</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--cyan)', background: 'rgba(0, 229, 195, 0.15)', border: '1px solid var(--cyan-20)', padding: '3px 10px', borderRadius: 10 }}>DAY {day}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button onClick={togglePlay} style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--bg-2)', border: '1px solid var(--b1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -1311,13 +1324,13 @@ function TemporalTab({ acc }) {
       </div>
 
       {day >= 14 && acc.level === 'HIGH' && (
-        <div style={{ padding: '6px 14px', background: 'var(--amber-08)', borderTop: '1px solid var(--amber-20)', borderBottom: '1px solid var(--amber-20)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0 }}>
+        <div style={{ padding: '6px 14px', background: 'rgba(254, 188, 46, 0.15)', borderTop: '1px solid var(--amber-20)', borderBottom: '1px solid var(--amber-20)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0 }}>
           <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '1px', color: 'var(--amber)' }}>VELOCITY INCREASE DETECTED · Tx freq 3.2×</span>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--t3)' }}>DAY 14</span>
         </div>
       )}
       {day >= 21 && ringNodes > 0 && acc.level === 'HIGH' && (
-        <div style={{ padding: '6px 14px', background: 'var(--red-08)', borderTop: '1px solid var(--red-20)', borderBottom: '1px solid var(--red-20)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0 }}>
+        <div style={{ padding: '6px 14px', background: 'rgba(255, 59, 92, 0.15)', borderTop: '1px solid var(--red-20)', borderBottom: '1px solid var(--red-20)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0 }}>
           <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '1px', color: 'var(--red)' }}>MULE RING NODE DETECTED · Ring connected</span>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--t3)' }}>DAY 21</span>
         </div>
@@ -1382,18 +1395,39 @@ function TerminalPanel({ acc, isFrozen, activeTab, setActiveTab }) {
         <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 9, fontWeight: 600, letterSpacing: '1.4px', textTransform: 'uppercase', color: 'var(--t3)' }}>AI Interrogator</span>
       </div>
       
-      <div style={{ height: 32, display: 'flex', background: 'var(--bg-1)', borderBottom: '1px solid var(--b1)', flexShrink: 0 }}>
-        {['AI LOG', 'FEDERATED', 'ADVERSARIAL'].map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)} style={{
-            flex: 1, height: '100%', border: 'none', borderBottom: activeTab === tab ? '2px solid var(--cyan)' : '2px solid transparent',
-            background: 'transparent', fontSize: 8, fontWeight: 600, letterSpacing: '1.2px', color: activeTab === tab ? 'var(--cyan)' : 'var(--t3)',
-            cursor: 'pointer', padding: 0, marginBottom: '-1px', transition: 'color 150ms, border-color 150ms'
-          }}>{tab}</button>
-        ))}
+      <div style={{ height: 36, display: 'flex', background: 'var(--bg-1)', borderBottom: '1px solid var(--b1)', flexShrink: 0, padding: '0 2px' }}>
+        {[
+          { id: 'AI LOG', label: 'AI LOG' }, { id: 'AUTO-SAR', label: 'AUTO-SAR' }, { id: 'AGENT-PIPE', label: 'AGENT-PIPE' }, { id: 'FEDERATED', label: 'FEDERATED' }, { id: 'ADVERSARIAL', label: 'ADVERSARIAL' }
+        ].map(tab => {
+          const isActive = activeTab === tab.id;
+          const unreadCount = { 'AGENT-PIPE': 1, 'FEDERATED': 2, 'ADVERSARIAL': 0 }; // mock data for demo
+          return (
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+            flex: 1, height: '100%', border: 'none', borderBottom: isActive ? '2px solid var(--cyan)' : '2px solid transparent',
+            background: isActive ? 'rgba(0,229,195,0.05)' : 'transparent',
+            fontSize: 9, fontWeight: isActive ? 700 : 600, letterSpacing: '1.4px', textTransform: 'uppercase',
+            color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.30)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2px', marginBottom: '-1px', transition: 'color 150ms, border-color 150ms'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>{tab.label}</span>
+              {unreadCount[tab.id] > 0 && (
+                <div style={{
+                  minWidth: 14, height: 14, borderRadius: 7,
+                  background: tab.id === 'FEDERATED' ? 'var(--amber)' : 'var(--cyan)', color: '#000', fontSize: 8, fontWeight: 800,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px'
+                }}>
+                  {unreadCount[tab.id]}
+                </div>
+              )}
+            </div>
+          </button>
+        )})}
       </div>
       
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {activeTab === 'AI LOG' && <AiLogTab acc={acc} isFrozen={isFrozen} />}
+        {activeTab === 'AUTO-SAR' && <div style={{padding: 16, color: 'var(--t2)', fontSize: 11}}>AUTO-SAR draft generation pending...</div>}
+        {activeTab === 'AGENT-PIPE' && <AgentPipelineTab acc={acc} />}
         {activeTab === 'FEDERATED' && <FederatedTab />}
         {activeTab === 'ADVERSARIAL' && <AdversarialTab acc={acc} />}
       </div>
@@ -1406,6 +1440,7 @@ function AiLogTab({ acc, isFrozen }) {
   const terminalRef = useRef(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLogs([]);
     if (!acc) return;
     let currentIdx = 0;
@@ -1472,11 +1507,11 @@ function FederatedTab() {
 
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {banks.map((b, i) => (
-          <div key={i} style={{ padding: '8px 12px', borderBottom: '1px solid var(--b1)' }}>
+          <div key={i} style={{ padding: '10px 14px', borderBottom: '1px solid var(--b1)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '8px 1fr auto', gap: '0 8px', alignItems: 'center' }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: b.status==='ACTIVE'?'var(--green)':b.status==='SYNCING'?'var(--amber)':'var(--red)', animation: b.status==='ACTIVE'?'pulse-ring-green 2s infinite':'' }} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--t1)' }}>{b.name}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t1)', letterSpacing: '0.3px' }}>{b.name}</span>
                 <span style={{ fontSize: 9, color: 'var(--t3)' }}>{b.id}</span>
               </div>
               <span style={{ fontSize: 7, padding: '2px 6px', background: 'var(--quantum-08)', border: '1px solid var(--quantum-20)', color: 'var(--quantum)', borderRadius: 3 }}>CKKS</span>
@@ -1496,7 +1531,7 @@ function FederatedTab() {
           ))}
         </div>
 
-        <div style={{ padding: '8px 12px', fontSize: 8, fontStyle: 'italic', color: 'var(--t3)', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ padding: '10px 14px', fontSize: 8, fontStyle: 'italic', color: 'var(--t3)', display: 'flex', alignItems: 'center', gap: 4 }}>
           <Lock size={10} /> No raw data transmitted. Model gradients only.
         </div>
       </div>
@@ -1529,18 +1564,18 @@ function AdversarialTab({ acc }) {
           <Shield size={32} color="var(--t2)" />
           <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--t1)' }}>ADVERSARIAL ROBUSTNESS TEST</div>
           <div style={{ fontSize: 11, color: 'var(--t2)', marginBottom: 16 }}>Test model against 5 attack mutations</div>
-          <button onClick={runTest} style={{ width: 160, height: 40, background: 'var(--red-08)', border: '1px solid var(--red-20)', borderRadius: 8, color: 'var(--red)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer' }}>RUN STRESS TEST</button>
+          <button onClick={runTest} style={{ width: 160, height: 40, background: 'rgba(255, 59, 92, 0.15)', border: '1px solid var(--red-20)', borderRadius: 8, color: 'var(--red)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer' }}>RUN STRESS TEST</button>
         </div>
       ) : (
         <div>
           <div style={{ height: 3, background: 'var(--b1)', borderRadius: 0, width: '100%' }}>
             <div style={{ height: '100%', width: `${(progress/5)*100}%`, background: 'var(--red)', transition: 'width 500ms ease-out', borderRadius: 0 }} />
           </div>
-          {progress < 5 && <div style={{ padding: '8px 12px', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--amber)' }}>RUNNING MUTATION {progress + 1} / 5...</div>}
+          {progress < 5 && <div style={{ padding: '10px 14px', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--amber)' }}>RUNNING MUTATION {progress + 1} / 5...</div>}
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {acc.adversarialScores.slice(0, progress).map((m, i) => (
-              <div key={i} style={{ padding: '8px 12px', borderBottom: '1px solid var(--b1)', display: 'grid', gridTemplateColumns: '140px 80px 48px 1fr', alignItems: 'center', gap: 8, animation: 'fadeInUp 300ms ease-out' }}>
+              <div key={i} style={{ padding: '10px 14px', borderBottom: '1px solid var(--b1)', display: 'grid', gridTemplateColumns: '140px 80px 48px 1fr', alignItems: 'center', gap: 8, animation: 'fadeInUp 300ms ease-out' }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--t1)' }}>{m.mutationName}</span>
                 <span style={{ fontSize: 9, background: m.evaded ? 'var(--red-08)' : 'var(--green-08)', border: `1px solid ${m.evaded ? 'var(--red-20)' : 'var(--green-20)'}`, color: m.evaded ? 'var(--red)' : 'var(--green)', padding: '2px 6px', borderRadius: 4, textAlign: 'center' }}>
                   {m.evaded ? 'EVADED ✗' : 'FLAGGED ✓'}
@@ -1575,7 +1610,7 @@ function AdversarialTab({ acc }) {
                 <div><div style={{fontSize:9,color:'var(--t2)'}}>Attack Vector Risk</div><div style={{fontSize:11,color:'var(--amber)'}}>MEDIUM</div></div>
               </div>
 
-              <div style={{ background: 'var(--amber-08)', border: '1px solid var(--amber-20)', borderRadius: 6, padding: 10, marginBottom: 12 }}>
+              <div style={{ background: 'rgba(254, 188, 46, 0.15)', border: '1px solid var(--amber-20)', borderRadius: 6, padding: 10, marginBottom: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <ShieldAlert size={12} color="var(--amber)" />
                   <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--amber)' }}>IDENTIFIED WEAKNESS:</span>
@@ -1594,18 +1629,18 @@ function AdversarialTab({ acc }) {
 
 function RiskRing({ score, level }) {
   const color = level==='HIGH'?'var(--red)':level==='MEDIUM'?'var(--amber)':'var(--green)';
-  const r = 38; const circ = 2 * Math.PI * r;
+  const r = 40; const circ = 2 * Math.PI * r;
   const fill = (score / 100) * circ;
   return (
-    <div style={{ position: 'relative', width: 88, height: 88, flexShrink: 0 }}>
-      <svg width="88" height="88" viewBox="0 0 88 88" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx="44" cy="44" r={r} stroke="rgba(255,255,255,0.06)" strokeWidth="5" fill="none"/>
-        <circle cx="44" cy="44" r={r} stroke={color} strokeWidth="5" fill="none" strokeLinecap="round"
+    <div style={{ position: 'relative', width: 100, height: 100, flexShrink: 0 }}>
+      <svg width="100" height="100" viewBox="0 0 100 100" style={{ filter: `drop-shadow(0 0 4px ${color})`, transform: 'rotate(-90deg)' }}>
+        <circle cx="50" cy="50" r={r} stroke="rgba(255,255,255,0.06)" strokeWidth="6" fill="none"/>
+        <circle cx="50" cy="50" r={r} stroke={color} strokeWidth="6" fill="none" strokeLinecap="round"
           strokeDasharray={`${fill} ${circ}`} style={{ transition: 'stroke-dasharray 900ms ease-out' }}/>
       </svg>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 700, color, lineHeight: 1 }}>{score.toFixed(1)}%</span>
-        <span style={{ fontSize: 7, fontWeight: 600, letterSpacing: '1px', color: 'var(--t3)', textTransform: 'uppercase' }}>RISK</span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 800, color, lineHeight: 1 }}>{score.toFixed(1)}%</span>
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1px', color: 'var(--t3)', textTransform: 'uppercase' }}>RISK</span>
       </div>
     </div>
   );
@@ -1626,9 +1661,9 @@ function StatusBar({ sessionTime }) {
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', animation: 'pulse-ring-green 1.5s ease-out infinite' }}/>
           <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--green)', letterSpacing: '0.8px' }}>SYSTEM OPERATIONAL</span>
         </div>
-        <span style={{ color: 'var(--b2)', fontSize: 10 }}>|</span>
+        <span style={{ color: 'var(--b2)', fontSize: 10 }} style={{ color: 'var(--b3)', fontSize: 10 }}>|</span>
         <span style={{ fontSize: 9, fontWeight: 400, color: 'var(--t3)', fontFamily: 'var(--font-mono)' }}>MODEL v2.4.1</span>
-        <span style={{ color: 'var(--b2)', fontSize: 10 }}>|</span>
+        <span style={{ color: 'var(--b2)', fontSize: 10 }} style={{ color: 'var(--b3)', fontSize: 10 }}>|</span>
         <span style={{ fontSize: 9, fontWeight: 400, color: 'var(--t3)', fontFamily: 'var(--font-mono)' }}>LAST RETRAIN: 2h ago</span>
       </div>
       
@@ -1645,10 +1680,78 @@ function StatusBar({ sessionTime }) {
 
       <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
         <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--t3)' }}>SESSION: {formatTime(sessionTime)}</span>
-        <span style={{ color: 'var(--b2)', fontSize: 10 }}>|</span>
+        <span style={{ color: 'var(--b2)', fontSize: 10 }} style={{ color: 'var(--b3)', fontSize: 10 }}>|</span>
         <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--t3)' }}>ANALYST: AY</span>
-        <span style={{ color: 'var(--b2)', fontSize: 10 }}>|</span>
+        <span style={{ color: 'var(--b2)', fontSize: 10 }} style={{ color: 'var(--b3)', fontSize: 10 }}>|</span>
         <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--t3)' }}>PUNE NODE 🇮🇳</span>
+      </div>
+    </div>
+  );
+}
+
+function AgentPipelineTab({ acc }) {
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPhase(0);
+    if (!acc) return;
+    const timers = [
+      setTimeout(() => setPhase(1), 500),
+      setTimeout(() => setPhase(2), 1500),
+      setTimeout(() => setPhase(3), 2500),
+      setTimeout(() => setPhase(4), 3500),
+      setTimeout(() => setPhase(5), 4500),
+      setTimeout(() => setPhase(6), 6000),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [acc]);
+
+  const agents = [
+    { name: 'AGENT 1: INTAKE', desc: 'Parsed 47 transactions, 6 neighbors, 3 devices' },
+    { name: 'AGENT 2: TYPOLOGY MATCH', desc: 'Matched: MULE NETWORK (confidence 91%)\nPattern: Test-then-drain + structuring hybrid' },
+    { name: 'AGENT 3: NETWORK MAPPER', desc: 'Mapped 6-hop network, 3 suspicious clusters\nRing size estimate: 12-18 accounts' },
+    { name: 'AGENT 4: ZK PROVER', desc: 'Verified 8 privacy-preserving rules on-chain\nZero-knowledge payload size: 2.1kb' },
+    { name: 'AGENT 5: NARRATIVE BUILDER', desc: 'Generated human-readable fraud summary' },
+    { name: 'SAR DRAFTER', desc: 'Prepared preliminary SAR form' }
+  ];
+
+  return (
+    <div style={{ padding: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {agents.map((agent, i) => {
+          const status = phase > i + 1 ? 'complete' : phase === i + 1 ? 'running' : 'waiting';
+          const isVisible = phase > 0 || i === 0;
+          
+          if (!isVisible) return null;
+
+          return (
+            <div key={i} style={{ 
+              display: 'flex', gap: 12, opacity: status === 'waiting' ? 0.5 : 1, transition: 'all 300ms',
+              minHeight: 52, padding: '10px 14px', background: status === 'running' ? 'rgba(0, 229, 195, 0.04)' : 'transparent',
+              borderBottom: '1px solid var(--b1)', borderLeft: status === 'running' ? '3px solid var(--cyan)' : '3px solid transparent'
+            }}>
+              <div style={{ marginTop: 2 }}>
+                {status === 'complete' && <CheckCircle size={14} color="var(--green)" />}
+                {status === 'running' && <div style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--cyan)', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />}
+                {status === 'waiting' && <div style={{ width: 14, height: 14, borderRadius: '50%', border: '2px dashed var(--t3)' }} />}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t1)', letterSpacing: '0.3px' }}>{agent.name}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: status === 'complete' ? 'var(--green)' : status === 'running' ? 'var(--cyan)' : 'var(--t3)', marginLeft: 'auto' }}>
+                    {status === 'complete' ? ' Complete 0.8s' : status === 'running' ? ' Running...' : ' Waiting'}
+                  </span>
+                </div>
+                {status !== 'waiting' && (
+                  <div style={{ fontSize: 11, color: 'var(--t2)', whiteSpace: 'pre-wrap', paddingLeft: 12, borderLeft: '1px solid var(--b2)' }}>
+                    {status === 'running' && i === 4 ? 'Generating narrative...' : status === 'running' && i === 5 ? 'Waiting for SAR Drafter...' : agent.desc}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
