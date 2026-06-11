@@ -1,7 +1,8 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const dbPath = path.join(__dirname, 'mulewatch.db');
+const isTest = process.env.NODE_ENV === 'test';
+const dbPath = isTest ? ':memory:' : path.join(__dirname, 'mulewatch.db');
 const db = new Database(dbPath);
 
 // Enable WAL mode for better concurrency

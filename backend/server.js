@@ -93,6 +93,10 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`Node.js Backend listening on port ${PORT}`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`Node.js Backend listening on port ${PORT}`);
+  });
+}
+
+module.exports = { app, server, io };
