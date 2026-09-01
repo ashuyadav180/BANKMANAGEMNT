@@ -3,98 +3,129 @@
 @tailwind utilities;
 
 :root {
-  --bg-0: #06090F;        /* page base */
-  --bg-1: #0B1017;        /* panel surface */
-  --bg-2: #111827;        /* elevated card */
-  --bg-3: #1A2235;        /* overlay / modal */
-  --bg-terminal: #030508; /* terminal only */
+  --bg-main: #EDF1F5;
+  --bg-panel: #FFFFFF;
+  --bg-sidebar: #E9EEF3;
+  --bg-subtle: #F8FAFC;
+  --bg-dark: #0F172A;
 
-  --cyan:       #00E5C3;
-  --cyan-20:    rgba(0,229,195,0.20);
-  --cyan-08:    rgba(0,229,195,0.08);
-  --cyan-dim:   #009E87;
+  --teal-primary: #008080;
+  --teal-dark: #0B6E6A;
+  --teal-light: #E6F4F4;
+  --teal-accent: #00C2A8;
 
-  --red:        #FF3B5C;
-  --red-20:     rgba(255,59,92,0.20);
-  --red-08:     rgba(255,59,92,0.08);
-  --red-dim:    #C42B46;
+  --gold-highlight: #F3E8D3;
+  --gold-border: #E5C992;
+  --gold-dark: #92400E;
 
-  --amber:      #FFB547;
-  --amber-20:   rgba(255,181,71,0.20);
-  --amber-08:   rgba(255,181,71,0.08);
+  --red-alert: #DC2626;
+  --red-bg: #FEF2F2;
+  --red-border: #FCA5A5;
 
-  --green:      #2ECC7A;
-  --green-20:   rgba(46,204,122,0.20);
-  --green-08:   rgba(46,204,122,0.08);
+  --amber-alert: #D97706;
+  --amber-bg: #FFFBEB;
+  --amber-border: #FDE68A;
 
-  --purple:     #A78BFA;
-  --purple-20:  rgba(167,139,250,0.20);
-  --purple-08:  rgba(167,139,250,0.08);
+  --t1: #0F172A;
+  /* primary text */
+  --t2: #64748B;
+  /* secondary text */
+  --t3: #94A3B8;
+  /* subtle text */
 
-  --t1: #E8EDF5;   /* primary text */
-  --t2: #7A8799;   /* secondary text */
-  --t3: #3E4A58;   /* tertiary / disabled */
-
-  --b1: rgba(255,255,255,0.06);  /* subtle border */
-  --b2: rgba(255,255,255,0.12);  /* medium border */
-  --b3: rgba(255,255,255,0.20);  /* strong border */
+  --b1: #E2E8F0;
+  /* standard border */
+  --b2: #CBD5E1;
+  /* medium border */
+  --b3: #94A3B8;
+  /* dark border */
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-0);
+  background-color: var(--bg-main);
   color: var(--t1);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-@keyframes pulse-ring-green {
-  0%   { box-shadow: 0 0 0 0 rgba(46,204,122,0.5); }
-  70%  { box-shadow: 0 0 0 6px rgba(46,204,122,0); }
-  100% { box-shadow: 0 0 0 0 rgba(46,204,122,0); }
-}
-@keyframes pulse-dot {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50%     { opacity: 0.6; transform: scale(0.8); }
-}
-@keyframes blink-cursor {
-  0%,100% { opacity: 1; }
-  50%     { opacity: 0; }
-}
-@keyframes slideInRow {
-  from { opacity: 0; transform: translateY(-16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.92); }
-  to   { opacity: 1; transform: scale(1); }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-/* Custom Scrollbar for all panels */
+/* Custom Scrollbar */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--b2) transparent;
 }
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--b2);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--t3);
+  background: var(--b3);
+}
+
+@keyframes pulse-dot {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes blink-cursor {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button global reset for consistent cursor */
+button {
+  cursor: pointer;
 }
